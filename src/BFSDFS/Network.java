@@ -1,5 +1,5 @@
 package BFSDFS;
-
+//Network
 import java.util.*;
 
 public class Network {
