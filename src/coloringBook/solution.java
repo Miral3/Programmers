@@ -1,12 +1,31 @@
 package coloringBook;
 
-import java.util.Collections;
-import java.util.PriorityQueue;
+/*
+문제 이름: 카카오프렌즈 컬러링북
+링크: https://programmers.co.kr/learn/courses/30/lessons/1829?language=java
+알고리즘: bfs
+자료구조: 배열, 큐
+*/
+
+
+import java.util.LinkedList;
+import java.util.Queue;
+
+class Node {
+    int y;
+    int x;
+
+    public Node(int y, int x) {
+        this.y = y;
+        this.x = x;
+    }
+}
 
 public class solution {
-    static int cnt;
     static boolean[][] isVisited;
-    static PriorityQueue<Integer> que;
+    static int[] dy = {-1, 1, 0, 0};
+    static int[] dx = {0, 0, -1, 1};
+
     public static void main(String[] args) {
         int m = 6;
         int n = 4;
@@ -21,54 +40,54 @@ public class solution {
     public static int[] solution(int m, int n, int[][] picture) {
         int numberOfArea = 0;
         int maxSizeOfOneArea = 0;
-        int element = 0;
 
-        cnt = 0;
         isVisited = new boolean[m][n];
-        que = new PriorityQueue<>();
         for(int i = 0; i < m; i++) {
             for(int j = 0; j < n; j++) {
                 if((!isVisited[i][j]) && picture[i][j] != 0) {
                     isVisited[i][j] = true;
-                    cnt = 1;
-                    element = picture[i][j];
-                    DFS(picture, i, j, element, m, n);
-                    que.add(cnt);
+                    numberOfArea++;
+                    maxSizeOfOneArea = Math.max(bfs(i, j, m, n, picture), maxSizeOfOneArea);
                 }
             }
         }
-        PriorityQueue<Integer> reversedPriorityQueue =
-                new PriorityQueue<Integer>(que.size(), Collections.reverseOrder());
-        reversedPriorityQueue.addAll(que);
 
-        numberOfArea = que.size();
-        maxSizeOfOneArea = reversedPriorityQueue.peek();
+
 
         int[] answer = new int[2];
         answer[0] = numberOfArea;
         answer[1] = maxSizeOfOneArea;
         return answer;
     }
-    public static void DFS(int[][] picture, int x, int y, int element, int m, int n) {
-        if(!(x-1<0) && picture[x-1][y] == element && (!isVisited[x-1][y])) {
-            isVisited[x-1][y] = true;
-            cnt++;
-            DFS(picture, x-1, y, element, m, n);
+    public static int bfs(int startY, int startX, int m, int n, int[][] pricture) {
+        Queue<Node> que = new LinkedList<>();
+        que.add(new Node(startY, startX));
+        int num = pricture[startY][startX];
+        int cnt = 1;
+
+        while (!que.isEmpty()) {
+            Node cur = que.poll();
+            int y = cur.y;
+            int x = cur.x;
+
+            for (int i = 0; i < 4; i++) {
+                int ny = y + dy[i];
+                int nx = x + dx[i];
+
+                if (ny < 0 || nx < 0 || ny >= m || nx >= n) {
+                    continue;
+                }
+
+                if (isVisited[ny][nx] || pricture[ny][nx] != num) {
+                    continue;
+                }
+
+                isVisited[ny][nx] = true;
+                que.add(new Node(ny, nx));
+                cnt++;
+            }
         }
-        if(!(x+1 >= m) && picture[x+1][y] == element && !isVisited[x+1][y]) {
-            isVisited[x+1][y] = true;
-            cnt++;
-            DFS(picture, x+1, y, element, m, n);
-        }
-        if(!(y-1<0) && picture[x][y-1] == element && !isVisited[x][y-1]) {
-            isVisited[x][y-1] = true;
-            cnt++;
-            DFS(picture, x, y-1, element, m, n);
-        }
-        if(!(y+1 >= n) && picture[x][y+1] == element && !isVisited[x][y+1]) {
-            isVisited[x][y+1] = true;
-            cnt++;
-            DFS(picture, x, y+1, element, m, n);
-        }
+
+        return cnt;
     }
 }
